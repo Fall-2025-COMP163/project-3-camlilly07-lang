@@ -24,6 +24,7 @@ def load_quests(filename="data/quests.txt"):
    
     # Check if file exists
     if not os.path.exists(filename):
+        #raises custom exception if file not found
         raise MissingDataFileError(f"Quest file not found: {filename}")
     
     # Try to read the file
@@ -31,9 +32,10 @@ def load_quests(filename="data/quests.txt"):
         with open(filename, 'r') as file:
             content = file.read()
     except Exception as e:
+        #raises corrupted data error if file cannot be read
         raise CorruptedDataError(f"Could not read quest file: {e}")
     
-    # Parse quests (separated by blank lines)
+    # Parse quests separates them by blank lines)
     quests = {}
     quest_blocks = content.strip().split('\n\n')
     
@@ -44,12 +46,14 @@ def load_quests(filename="data/quests.txt"):
             
             # Parse this quest block
             lines = block.strip().split('\n')
+
+            #reads lines and converts them into a quest dictionary
             quest = parse_quest_block(lines)
             
             # Validate the quest
             validate_quest_data(quest)
             
-            # Store by quest_id
+            # Stores each quest by its quest_id
             quests[quest['quest_id']] = quest
     
     except InvalidDataFormatError:
@@ -116,6 +120,7 @@ def validate_quest_data(quest_dict):
         'prerequisite': str
     }
     
+    #Ai used to help with for loop structure and isinstance checks
     # Check each required field
     for field, field_type in required_fields.items():
         # Check if field exists
@@ -151,6 +156,7 @@ def validate_item_data(item_dict):
         
         # Check field type
         # Handle tuple of types (allows multiple types)
+        #Ai used to help with isinstance checks for multiple types and error message formatting
         if isinstance(field_type, tuple):
             if not isinstance(item_dict[field], field_type):
                 type_names = " or ".join(t.__name__ for t in field_type)
